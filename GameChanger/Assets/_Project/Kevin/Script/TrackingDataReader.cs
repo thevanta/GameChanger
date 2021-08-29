@@ -41,7 +41,8 @@ public class TrackingDataReader : MonoBehaviour
                 quaternionW[_currentIndex]);
             
             thisTransform.localPosition = _currentPosition;
-            transform.localRotation = _currentRotation;
+            //Rotations are currently incorrect
+            //transform.localRotation = _currentRotation;
             
             _currentIndex++;
         }
