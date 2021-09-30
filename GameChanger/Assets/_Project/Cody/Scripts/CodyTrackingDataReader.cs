@@ -30,33 +30,31 @@ public class CodyTrackingDataReader : MonoBehaviour
     {
         if (_currentIndex < positionX.Count)
         {
-            Quat quat = new Quat(quaternionW[_currentIndex], quaternionI[_currentIndex], quaternionJ[_currentIndex], quaternionK[_currentIndex]);
-            Quat qx = new Quat (Mathf.Cos (0.01f / 2), 0, 0, Mathf.Sin (0.01f / 2));
-            Quat qy = new Quat (Mathf.Cos (0.01f / 2), 0, Mathf.Sin (0.01f / 2), 0);
-            Quat qz = new Quat (Mathf.Cos (0.01f / 2), Mathf.Sin (0.01f / 2), 0, 0);
-            
-            quat = Quat.Multiply (qx, quat);
-            quat = Quat.Multiply (qy, quat);
-            quat = Quat.Multiply (qz, quat);
-
-            _currentRotation = quat.ToUnityQuaternion();
-
-                
             _currentPosition = new Vector3(
                 positionX[_currentIndex], 
                 positionY[_currentIndex], 
-                positionZ[_currentIndex]);
-            /*_currentRotation = new Quaternion(
+                -positionZ[_currentIndex]);
+            _currentRotation = new Quaternion(
                 quaternionI[_currentIndex], 
                 quaternionJ[_currentIndex],
                 quaternionK[_currentIndex], 
-                quaternionW[_currentIndex]);*/
+                quaternionW[_currentIndex]);
             
             thisTransform.localPosition = _currentPosition;
-            transform.localRotation = _currentRotation;
+            thisTransform.localRotation = _currentRotation;
             
             _currentIndex++;
         }
+        else
+        {
+            _currentIndex = 0;
+        }
+    }
+    
+    static Vector3 GetLocalEulerAtRotation(Transform transform, Quaternion targetRotation)
+    {
+        var q = Quaternion.Inverse(transform.parent.rotation) * targetRotation ;
+        return q.eulerAngles;
     }
 
     [ContextMenu("PopulateDependencies")]
@@ -90,7 +88,16 @@ public class CodyTrackingDataReader : MonoBehaviour
         _currentIndex = 0;
     }
     
-    public class Quat{
+    public float Norm(float x, float y, float z, float w){
+        return Mathf.Sqrt (w * w + x * x + y * y + z * z);
+    }
+    
+    public Quaternion Normalize(float x, float y, float z, float w){
+        float m = Norm (x, y, z, w);
+        return new Quaternion (w / m, x / m, y / m, z / m);
+    }
+    
+    /*public class Quat{
         // Represents w + xi + yj + zk
         public float w, x, y, z;
         public Quat(float w, float x, float y, float z){
@@ -100,7 +107,7 @@ public class CodyTrackingDataReader : MonoBehaviour
             this.z = z;
         }
  
-        public float Norm(){
+        public float Norm(float x, float y, float z, float w){
             return Mathf.Sqrt (w * w + x * x + y * y + z * z);
         }
  
@@ -121,5 +128,5 @@ public class CodyTrackingDataReader : MonoBehaviour
         public Quaternion ToUnityQuaternion(){
             return new Quaternion (w, x, y, z);
         }
-    }
+    }*/
 }
